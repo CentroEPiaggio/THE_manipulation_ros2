@@ -1,0 +1,12 @@
+[submodule "src/Universal_Robots_ROS2_GZ_Simulation"]
+	path = src/Universal_Robots_ROS2_GZ_Simulation
+	url = https://github.com/UniversalRobots/Universal_Robots_ROS2_GZ_Simulation.git
+[submodule "src/softweezers_description"]
+	path = src/softweezers_description
+	url = https://github.com/CentroEPiaggio/softweezers_description.git
+[submodule "src/ur5_softclaw_description"]
+	path = src/ur5_softclaw_description
+	url = https://github.com/CentroEPiaggio/ur5_softclaw_description.git
+[submodule "src/ur5_softclaw_gz"]
+	path = src/ur5_softclaw_gz
+	url = https://github.com/CentroEPiaggio/ur5_softclaw_gz.git

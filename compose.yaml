@@ -29,7 +29,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       # - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
       - ~/.bash_history:/home/ros/.bash_history
-      - ./src:/home/ros/the_manipulation_ws/src
+      - ./:/home/ros/the_manipulation_ws/
       - ./config:/home/ros/the_manipulation_ws/ur_config
       
       
@@ -39,6 +39,7 @@ services:
     command: >
       bash -c "
         source /opt/ros/humble/setup.bash &&
+        rosdep install --ignore-src --from-paths src/Universal_Robots_ROS2_GZ_Simulation -y &&
         echo 'ROS2 humble environment loaded' &&
         bash
       "

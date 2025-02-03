@@ -1,13 +1,15 @@
-FROM osrf/ros:humble-desktop-full
+FROM osrf/ros:humble-desktop-full-jammy
 
 # set the environment variable with the command ENV <key>=<value>, it can be replaced online
 ENV DEBIAN_FRONTEND=noninteractive
 # RUN is used to execute and add new layer on top of the base immage
 RUN apt update --fix-missing
+RUN apt upgrade -y
 RUN apt install -y \
     ros-humble-ros2-control \
     ros-humble-ros2-controllers \
-    ros-humble-ur
+    ros-humble-ur 
+RUN apt install -y ros-humble-moveit
 RUN apt install -y ros-humble-plotjuggler
 RUN apt install -y \
     ros-humble-joint-state-publisher \
@@ -72,14 +74,14 @@ RUN pip3 install numpy
 # Set up auto-source of workspace for ros user
 ARG WORKSPACE=THE_manipulation_ws
 WORKDIR /home/${USERNAME}/${WORKSPACE}
-RUN mkdir src
-RUN mkdir src/Universal_Robots_ROS2_Driver
+# RUN mkdir src
+# RUN mkdir src/Universal_Robots_ROS2_Driver
 
-RUN git clone -b humble https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver.git src/Universal_Robots_ROS2_Driver
-# RUN vcs import src --skip-existing --input src/Universal_Robots_ROS2_Driver/Universal_Robots_ROS2_Driver.humble.repos
-RUN sudo apt-get update
-RUN rosdep update 
-RUN rosdep install --from-paths src -y --ignore-src
+# RUN git clone -b humble https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver.git src/Universal_Robots_ROS2_Driver
+# # RUN vcs import src --skip-existing --input src/Universal_Robots_ROS2_Driver/Universal_Robots_ROS2_Driver.humble.repos
+# RUN sudo apt-get update
+# RUN rosdep update 
+# RUN rosdep install --from-paths src -y --ignore-src
 
 
 # install the UR library 

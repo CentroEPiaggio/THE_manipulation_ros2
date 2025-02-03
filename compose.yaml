@@ -31,6 +31,9 @@ services:
       - ~/.bash_history:/home/ros/.bash_history
       - ./:/home/ros/the_manipulation_ws/
       - ./config:/home/ros/the_manipulation_ws/ur_config
+      - /dev/nvidia0:/dev/nvidia0
+      - /dev/nvidiactl:/dev/nvidiactl
+      - /dev/nvidia-modeset:/dev/nvidia-modeset
       
       
       
@@ -39,16 +42,22 @@ services:
     command: >
       bash -c "
         source /opt/ros/humble/setup.bash &&
+        if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then \
+        sudo rosdep init \
+        fi &&
+        rosdep update && 
         rosdep install --ignore-src --from-paths src/Universal_Robots_ROS2_GZ_Simulation -y &&
         echo 'ROS2 humble environment loaded' &&
         bash
       "
-    # devices:
-    #   - /dev/dri:/dev/dri
-    #   - /dev/nvidia0:/dev/nvidia0
-    #   - /dev/nvidiactl:/dev/nvidiactl
-    #   - /dev/nvidia-modeset:/dev/nvidia-modeset
-
+    runtime: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
  
 

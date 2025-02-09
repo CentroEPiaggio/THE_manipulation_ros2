@@ -9,7 +9,9 @@ RUN apt install -y \
     ros-humble-ros2-control \
     ros-humble-ros2-controllers \
     ros-humble-ur 
-RUN apt install -y ros-humble-moveit
+RUN apt install -y ros-humble-moveit \
+    ros-humble-graph-msgs \
+    ros-humble-moveit-visual-tools 
 RUN apt install -y ros-humble-plotjuggler
 RUN apt install -y \
     ros-humble-joint-state-publisher \

@@ -10,3 +10,6 @@
 [submodule "src/ur5_softclaw_gz"]
 	path = src/ur5_softclaw_gz
 	url = https://github.com/CentroEPiaggio/ur5_softclaw_gz.git
+[submodule "src/moveit_task_constructor"]
+	path = src/moveit_task_constructor
+	url = https://github.com/ros-planning/moveit_task_constructor.git

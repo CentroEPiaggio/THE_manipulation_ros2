@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/opt/ros/humble/include/**",
+                "/usr/include/eigen3",
+                "/opt/ros/humble/include/rclcpp/rclcpp",
+                "${workspaceFolder}/src/moveit_task_constructor/core/include",
+                "${workspaceFolder}/install/the_interfaces/include/the_interfaces",
+                "${workspaceFolder}/src/the_mtc_planner/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}

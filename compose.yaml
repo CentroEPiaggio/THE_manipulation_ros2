@@ -47,6 +47,7 @@ services:
         fi &&
         rosdep update && 
         rosdep install --ignore-src --from-paths src/Universal_Robots_ROS2_GZ_Simulation -y &&
+        rosdep install --ignore-src --from-paths src/moveit_task_constructor -y &&
         echo 'ROS2 humble environment loaded' &&
         bash
       "

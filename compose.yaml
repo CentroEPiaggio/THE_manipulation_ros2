@@ -24,6 +24,7 @@ services:
       - HISTFILE=/home/ros/.bash_history
       - HISTFILESIZE=10000
       - RCUTILS_COLORIZED_OUTPUT=1
+      - IGN_GAZEBO_RESOURCE_PATH=/opt/ros/humble/share/
     privileged: true  # Fixed spelling and removed duplicate
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw

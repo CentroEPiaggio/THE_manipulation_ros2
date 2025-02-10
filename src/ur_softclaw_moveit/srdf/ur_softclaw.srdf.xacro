@@ -14,14 +14,52 @@
     <chain base_link="$(arg prefix)base_link" tip_link="$(arg prefix)fixed_fingertip" />
   </group>
 
-  <xacro:include filename="$(find ur_softclaw_moveit)/srdf/ur_macro.srdf.xacro"/>
+  <group_state name="$(arg prefix)home" group="$(arg prefix)$(arg name)_manipulator">
+    <joint name="$(arg prefix)elbow_joint" value="0" />
+    <joint name="$(arg prefix)shoulder_lift_joint" value="-1.5707" />
+    <joint name="$(arg prefix)shoulder_pan_joint" value="0" />
+    <joint name="$(arg prefix)wrist_1_joint" value="0" />
+    <joint name="$(arg prefix)wrist_2_joint" value="0" />
+    <joint name="$(arg prefix)wrist_3_joint" value="0" />
+  </group_state>
+  <group_state name="$(arg prefix)up" group="$(arg prefix)$(arg name)_manipulator">
+    <joint name="$(arg prefix)elbow_joint" value="0" />
+    <joint name="$(arg prefix)shoulder_lift_joint" value="-1.5707" />
+    <joint name="$(arg prefix)shoulder_pan_joint" value="0" />
+    <joint name="$(arg prefix)wrist_1_joint" value="-1.5707" />
+    <joint name="$(arg prefix)wrist_2_joint" value="0" />
+    <joint name="$(arg prefix)wrist_3_joint" value="0" />
+  </group_state>
+  <group_state name="$(arg prefix)test_configuration" group="$(arg prefix)$(arg name)_manipulator">
+    <joint name="$(arg prefix)elbow_joint" value="1.4" />
+    <joint name="$(arg prefix)shoulder_lift_joint" value="-1.62" />
+    <joint name="$(arg prefix)shoulder_pan_joint" value="1.54" />
+    <joint name="$(arg prefix)wrist_1_joint" value="-1.2" />
+    <joint name="$(arg prefix)wrist_2_joint" value="-1.6" />
+    <joint name="$(arg prefix)wrist_3_joint" value="-0.11" />
+  </group_state>
+  <!--END EFFECTOR - Purpose - Represent information about an end effector.-->
+  <!--VIRTUAL JOINT - Purpose - this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
+  <!--DISABLE COLLISIONS - By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
+  <disable_collisions link1="$(arg prefix)base_link" link2="$(arg prefix)base_link_inertia" reason="Adjacent" />
+  <disable_collisions link1="$(arg prefix)base_link_inertia" link2="$(arg prefix)shoulder_link" reason="Adjacent" />
+  <disable_collisions link1="$(arg prefix)tool0" link2="$(arg prefix)wrist_1_link" reason="Never" />
+  <disable_collisions link1="$(arg prefix)tool0" link2="$(arg prefix)wrist_2_link" reason="Never" />
+  <disable_collisions link1="$(arg prefix)tool0" link2="$(arg prefix)wrist_3_link" reason="Adjacent" />
+  <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)upper_arm_link" reason="Adjacent" />
+  <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)wrist_1_link" reason="Adjacent" />
+  <disable_collisions link1="$(arg prefix)shoulder_link" link2="$(arg prefix)upper_arm_link" reason="Adjacent" />
+  <disable_collisions link1="$(arg prefix)wrist_1_link" link2="$(arg prefix)wrist_2_link" reason="Adjacent" />
+  <disable_collisions link1="$(arg prefix)wrist_1_link" link2="$(arg prefix)wrist_3_link" reason="Never" />
+  <disable_collisions link1="$(arg prefix)wrist_2_link" link2="$(arg prefix)wrist_3_link" reason="Adjacent" />
+  
   <xacro:include filename="$(find ur_softclaw_moveit)/srdf/softclaw.srdf.xacro"/> 
 
-  <xacro:ur_srdf name="$(arg name)" prefix="$(arg prefix)"/>
+  <!-- <xacro:ur_srdf name="$(arg name)" prefix="$(arg prefix)"/> -->
   
   <xacro:sofclaw_gripper/> 
 
-   <disable_collisions link1="$(arg prefix)wrist_3_link" link2="qbsoftclaw_frame_finger" reason="Adjacent"/>
+  <disable_collisions link1="$(arg prefix)wrist_3_link" link2="qbsoftclaw_frame_finger" reason="Adjacent"/>
 
 
 </robot>

@@ -1,65 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <robot xmlns:xacro="http://wiki.ros.org/xacro" name="$(arg name)">
 
-  <!-- robot name parameter -->
-  <xacro:arg name="name" default="ur"/>
-  <!-- parameters -->
-  <xacro:arg name="prefix" default="" />
-  <!--GROUPS - Representation of a set of joints and links. This can be useful for specifying DOF to plan for, defining arms, end effectors, etc-->
-  <!--LINKS - When a link is specified, the parent joint of that link (if it exists) is automatically included-->
-  <!--JOINTS - When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
-  <!--CHAINS - When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
-  <!--SUBGROUPS - Groups can also be formed by referencing to already defined group names-->
-  <group name="$(arg prefix)$(arg name)_manipulator">
-    <chain base_link="$(arg prefix)base_link" tip_link="$(arg prefix)fixed_fingertip" />
-  </group>
+    <!-- robot name parameter -->
+    <xacro:arg name="name" default="ur"/>
+    <!-- parameters -->
+    <xacro:arg name="prefix" default="" />
+    <!--GROUPS - Representation of a set of joints and links. This can be useful for specifying DOF to plan for, defining arms, end effectors, etc-->
+    <!--LINKS - When a link is specified, the parent joint of that link (if it exists) is automatically included-->
+    <!--JOINTS - When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
+    <!--CHAINS - When a chain is specified, all the links along the chain (including endpoints) are included in the group. Additionally, all the joints that are parents to included links are also included. This means that joints along the chain and the parent joint of the base link are included in the group-->
+    <!--SUBGROUPS - Groups can also be formed by referencing to already defined group names-->
+    <xacro:include filename="$(find ur_moveit_config)/srdf/ur_macro.srdf.xacro"/>
+    <xacro:include filename="$(find ur_softclaw_moveit)/srdf/softclaw.srdf.xacro"/> 
 
-  <group_state name="$(arg prefix)home" group="$(arg prefix)$(arg name)_manipulator">
-    <joint name="$(arg prefix)elbow_joint" value="0" />
-    <joint name="$(arg prefix)shoulder_lift_joint" value="-1.5707" />
-    <joint name="$(arg prefix)shoulder_pan_joint" value="0" />
-    <joint name="$(arg prefix)wrist_1_joint" value="0" />
-    <joint name="$(arg prefix)wrist_2_joint" value="0" />
-    <joint name="$(arg prefix)wrist_3_joint" value="0" />
-  </group_state>
-  <group_state name="$(arg prefix)up" group="$(arg prefix)$(arg name)_manipulator">
-    <joint name="$(arg prefix)elbow_joint" value="0" />
-    <joint name="$(arg prefix)shoulder_lift_joint" value="-1.5707" />
-    <joint name="$(arg prefix)shoulder_pan_joint" value="0" />
-    <joint name="$(arg prefix)wrist_1_joint" value="-1.5707" />
-    <joint name="$(arg prefix)wrist_2_joint" value="0" />
-    <joint name="$(arg prefix)wrist_3_joint" value="0" />
-  </group_state>
-  <group_state name="$(arg prefix)test_configuration" group="$(arg prefix)$(arg name)_manipulator">
-    <joint name="$(arg prefix)elbow_joint" value="1.4" />
-    <joint name="$(arg prefix)shoulder_lift_joint" value="-1.62" />
-    <joint name="$(arg prefix)shoulder_pan_joint" value="1.54" />
-    <joint name="$(arg prefix)wrist_1_joint" value="-1.2" />
-    <joint name="$(arg prefix)wrist_2_joint" value="-1.6" />
-    <joint name="$(arg prefix)wrist_3_joint" value="-0.11" />
-  </group_state>
-  <!--END EFFECTOR - Purpose - Represent information about an end effector.-->
-  <!--VIRTUAL JOINT - Purpose - this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
-  <!--DISABLE COLLISIONS - By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
-  <disable_collisions link1="$(arg prefix)base_link" link2="$(arg prefix)base_link_inertia" reason="Adjacent" />
-  <disable_collisions link1="$(arg prefix)base_link_inertia" link2="$(arg prefix)shoulder_link" reason="Adjacent" />
-  <disable_collisions link1="$(arg prefix)tool0" link2="$(arg prefix)wrist_1_link" reason="Never" />
-  <disable_collisions link1="$(arg prefix)tool0" link2="$(arg prefix)wrist_2_link" reason="Never" />
-  <disable_collisions link1="$(arg prefix)tool0" link2="$(arg prefix)wrist_3_link" reason="Adjacent" />
-  <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)upper_arm_link" reason="Adjacent" />
-  <disable_collisions link1="$(arg prefix)forearm_link" link2="$(arg prefix)wrist_1_link" reason="Adjacent" />
-  <disable_collisions link1="$(arg prefix)shoulder_link" link2="$(arg prefix)upper_arm_link" reason="Adjacent" />
-  <disable_collisions link1="$(arg prefix)wrist_1_link" link2="$(arg prefix)wrist_2_link" reason="Adjacent" />
-  <disable_collisions link1="$(arg prefix)wrist_1_link" link2="$(arg prefix)wrist_3_link" reason="Never" />
-  <disable_collisions link1="$(arg prefix)wrist_2_link" link2="$(arg prefix)wrist_3_link" reason="Adjacent" />
-  
-  <xacro:include filename="$(find ur_softclaw_moveit)/srdf/softclaw.srdf.xacro"/> 
+    <!-- <xacro:ur_srdf name="$(arg name)" prefix="$(arg prefix)"/> -->
+    <xacro:ur_srdf name="ur" prefix="$(arg prefix)"/>
+    <xacro:sofclaw_gripper/> 
 
-  <!-- <xacro:ur_srdf name="$(arg name)" prefix="$(arg prefix)"/> -->
-  
-  <xacro:sofclaw_gripper/> 
+    <disable_collisions link1="$(arg prefix)wrist_3_link" link2="qbsoftclaw_frame_finger" reason="Adjacent"/>
 
-  <disable_collisions link1="$(arg prefix)wrist_3_link" link2="qbsoftclaw_frame_finger" reason="Adjacent"/>
-
+    <group name="ur_softclaw_manipulator">
+        <group name="ur_manipulator"/>
+        <group name="softclaw"/>
+    </group>
+    <end_effector group="softclaw" name="tip" parent_group="ur_manipulator" parent_link="$(arg prefix)tool0"/>
 
 </robot>

@@ -6,16 +6,16 @@
 -->
     <xacro:macro name="sofclaw_gripper" params="">
         
-        <group name="gripper">
+        <group name="softclaw">
             <link name="qbsoftclaw_frame_finger"/>
             <link name="fixed_fingertip"/>
             <link name="qbsoftclaw_mobile_finger_400"/>
             <joint name="claw_joint"/>
         </group>
-        <group_state group="gripper" name="open">
+        <group_state group="softclaw" name="open">
             <joint name="claw_joint" value="0.0"/>
         </group_state>
-        <group_state group="gripper" name="close">
+        <group_state group="softclaw" name="close">
             <joint name="claw_joint" value="-0.175"/>
         </group_state>
         <disable_collisions link1="qbsoftclaw_frame_finger" link2="fixed_fingertip" reason="Adjacent"/>

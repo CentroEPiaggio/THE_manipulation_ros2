@@ -191,6 +191,7 @@ def generate_launch_description():
         name="robot_state_publisher",
         output="both",
         parameters=[moveit_config.robot_description, {"use_sim_time": use_sim_time}],
+        
     )
 
     ld.add_action(run_move_group_node)

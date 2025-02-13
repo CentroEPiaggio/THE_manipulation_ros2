@@ -9,7 +9,9 @@
                 "/opt/ros/humble/include/rclcpp/rclcpp",
                 "${workspaceFolder}/src/moveit_task_constructor/core/include",
                 "${workspaceFolder}/install/the_interfaces/include/the_interfaces",
-                "${workspaceFolder}/src/the_mtc_planner/include"
+                "${workspaceFolder}/src/the_mtc_planner/include",
+                "/usr/include/x86_64-linux-gnu/qt5/QtCore",
+                "/usr/include/x86_64-linux-gnu/qt5"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

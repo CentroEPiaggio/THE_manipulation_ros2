@@ -1,7 +1,0 @@
-geometry_msgs/Pose target_pose
-float64 motion_duration
-
----
-
-bool result
-string error

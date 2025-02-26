@@ -5,6 +5,7 @@
     <xacro:arg name="name" default="ur"/>
     <!-- parameters -->
     <xacro:arg name="prefix" default="" />
+    <xacro:arg name="simulation" default="true" />
     <!--GROUPS - Representation of a set of joints and links. This can be useful for specifying DOF to plan for, defining arms, end effectors, etc-->
     <!--LINKS - When a link is specified, the parent joint of that link (if it exists) is automatically included-->
     <!--JOINTS - When a joint is specified, the child link of that joint (which will always exist) is automatically included-->
@@ -15,7 +16,7 @@
 
     <!-- <xacro:ur_srdf name="$(arg name)" prefix="$(arg prefix)"/> -->
     <xacro:ur_srdf name="ur" prefix="$(arg prefix)"/>
-    <xacro:sofclaw_gripper/> 
+    <xacro:sofclaw_gripper simulation="$(arg simulation)"/> 
 
     <disable_collisions link1="$(arg prefix)wrist_3_link" link2="qbsoftclaw_frame_finger" reason="Adjacent"/>
 

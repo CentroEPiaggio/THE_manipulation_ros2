@@ -117,7 +117,8 @@ def generate_launch_description():
             "script_filename": "ros_control.urscript",
             "input_recipe_filename": "rtde_input_recipe.txt",
             "output_recipe_filename": "rtde_output_recipe.txt",
-            "prefix": prefix
+            "prefix": prefix,
+            "sim_ignition": "true"
         }
     )
     #set robot description semantic
@@ -125,7 +126,8 @@ def generate_launch_description():
         file_path="srdf/ur_softclaw.srdf.xacro",
         mappings= {
             "prefix": prefix,
-            "name": "ur_softclaw"
+            "name": "ur_softclaw",
+            "simulation": "true"
         }
     )
 
@@ -135,7 +137,7 @@ def generate_launch_description():
     moveit_config_builder.joint_limits()
 
     moveit_config_builder.trajectory_execution(
-        file_path="config/ur_softclaw_controllers.yaml",
+        file_path="config/ur_softclaw_controllers_sim.yaml",
         moveit_manage_controllers=False
     )
 

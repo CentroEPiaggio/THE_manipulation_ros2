@@ -25,6 +25,8 @@ services:
       - HISTFILESIZE=10000
       - RCUTILS_COLORIZED_OUTPUT=1
       - IGN_GAZEBO_RESOURCE_PATH=/opt/ros/humble/share/
+      - ROBOT_IP=192.168.15.10
+      - LOCAL_DEVICE_NAME=/tmp/ttyUR
     privileged: true  # Fixed spelling and removed duplicate
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
@@ -35,6 +37,7 @@ services:
       - /dev/nvidia0:/dev/nvidia0
       - /dev/nvidiactl:/dev/nvidiactl
       - /dev/nvidia-modeset:/dev/nvidia-modeset
+      - /dev:/dev
       
       
       
@@ -42,6 +45,7 @@ services:
     # Command to source ROS2 environment and start shell
     command: >
       bash -c "
+      sudo apt update --fix-missing &&
         source /opt/ros/humble/setup.bash &&
         if [ ! -f /etc/ros/rosdep/sources.list.d/20-default.list ]; then \
         sudo rosdep init \
@@ -49,6 +53,7 @@ services:
         rosdep update && 
         rosdep install --ignore-src --from-paths src/Universal_Robots_ROS2_GZ_Simulation -y &&
         rosdep install --ignore-src --from-paths src/moveit_task_constructor -y &&
+        sudo gpasswd -a ros dialout && 
         echo 'ROS2 humble environment loaded' &&
         bash
       "

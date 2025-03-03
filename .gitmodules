@@ -16,3 +16,9 @@
 [submodule "src/THE_ROS2_interfaces"]
 	path = src/THE_ROS2_interfaces
 	url = https://github.com/Cionix90/THE_ROS2_interfaces.git
+[submodule "src/qbdevice-ros"]
+	path = src/qbdevice-ros
+	url = https://bitbucket.org/qbrobotics/qbdevice-ros.git
+[submodule "src/qbmove-ros"]
+	path = src/qbmove-ros
+	url = https://bitbucket.org/qbrobotics/qbmove-ros.git

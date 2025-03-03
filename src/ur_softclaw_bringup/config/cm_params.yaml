@@ -1,0 +1,14 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 500  # Hz
+qbdevice_hw_interface:
+  ros__parameters:
+    device_id: 1
+    device_name: "qbclaw_1"
+    device_type: "qbclaw"
+    get_currents: True
+    get_positions: True
+    max_repeats: 3
+    set_commands_async: True
+    set_commands: True
+    rescan_on_initialization: False

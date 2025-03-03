@@ -1,0 +1,4 @@
+  group_name: ur_softclaw_manipulator
+  eef_ik: tool0
+  max_plan_solution: 2
+

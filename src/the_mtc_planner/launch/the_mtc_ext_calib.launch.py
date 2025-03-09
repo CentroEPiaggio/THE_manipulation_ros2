@@ -143,7 +143,14 @@ def generate_launch_description():
             
         )
     
-
+    # #start rsp node
+    # robot_state_publisher_node = Node(
+    #     package="robot_state_publisher",
+    #     executable="robot_state_publisher",
+    #     output="both",
+    #     parameters=[moveit_config.robot_description],
+    # )
+    # ld.add_action(robot_state_publisher_node)
     # Define rviz node
     rviz_config_file = PathJoinSubstitution(
         [FindPackageShare("the_mtc_planner"), "rviz", "ext_calib_visual_conf.rviz"]

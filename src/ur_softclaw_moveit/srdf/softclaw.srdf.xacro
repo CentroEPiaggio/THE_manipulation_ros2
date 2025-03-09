@@ -11,6 +11,7 @@
                 <link name="qbsoftclaw_frame_finger"/>
                 <link name="fixed_fingertip"/>
                 <link name="qbsoftclaw_mobile_finger_400"/>
+                <link name="aruco_frame"/>
                 <joint name="claw_joint"/>
             </group>
             <group_state group="softclaw" name="open">

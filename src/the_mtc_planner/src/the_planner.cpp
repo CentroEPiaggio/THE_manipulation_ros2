@@ -23,6 +23,8 @@ namespace the_task_generator
         
         get_parameters();
 
+
+
         
         // create service for motion
         motion_service_ = this->create_service<PlanningService>(
@@ -60,6 +62,8 @@ namespace the_task_generator
     {
         if(!this->has_parameter("group_name"))
             declare_parameter<std::string>("group_name","ur_manipulator");
+        if(!this->has_parameter("planner_id"))
+            declare_parameter<std::string>("planner_id","RRTConnectkConfigDefault");
         if(!this->has_parameter("default_eef_ik"))
             declare_parameter<std::string>("default_eef_ik","fixed_fingertip");
         if(!this->has_parameter("max_plan_solution"))
@@ -86,7 +90,7 @@ namespace the_task_generator
         this->get_parameter("group_name",group_name_);
         this->get_parameter("default_eef_ik",default_eef_ik_);
         this->get_parameter("max_plan_solution",max_plan_solution_);
-        this->get_parameter("planning_timeout",planning_timeout_);
+        
         this->get_parameter("visualize_cartesian_path",visualize_cartesian_path_);
 
         this->get_parameter("camera_frame_position",camera_frame_position);
@@ -138,7 +142,8 @@ namespace the_task_generator
 
     void TaskConstructorPlanner::set_up_planning_scene(std::vector<double> table_dimensions)
     {
-        moveit::planning_interface::PlanningSceneInterface psi;
+
+        psi_ = std::make_unique<moveit::planning_interface::PlanningSceneInterface>();
         //create moveit collision msg 
         moveit_msgs::msg::CollisionObject table_collision,workspace_collision;
         table_collision.header.frame_id = "world";
@@ -155,9 +160,10 @@ namespace the_task_generator
         table_collision.primitives.push_back(prim);
         table_collision.primitive_poses.push_back(table_pose);
         table_collision.operation = table_collision.ADD;
-        psi.applyCollisionObject(table_collision);
+        psi_->applyCollisionObject(table_collision);
         add_workspace_collision(workspace_collision);
-        psi.applyCollisionObject(workspace_collision);
+        psi_->applyCollisionObject(workspace_collision);
+        
 
 
 
@@ -266,28 +272,28 @@ namespace the_task_generator
         bool res;
         Vector3d camera_pos;
         Quaterniond camera_ori;
-        moveit::planning_interface::PlanningSceneInterface psi;
         moveit_msgs::msg::CollisionObject workspace_collision;
 
         workspace_collision.header.frame_id = INERTIAL_FRAME;
         workspace_collision.id = WORKSPACE_NAME;
         workspace_collision.operation = workspace_collision.REMOVE;
-        if(!psi.applyCollisionObject(workspace_collision))
+        if(!psi_->applyCollisionObject(workspace_collision))
         {
             response->set__result(false);
             return;
         }
+        rclcpp::sleep_for(std::chrono::milliseconds(20));
         // update  local variable
         camera_pos << request->target_pose.position.x,request->target_pose.position.y,request->target_pose.position.z;
         camera_ori = Quaterniond(request->target_pose.orientation.w,request->target_pose.orientation.x,request->target_pose.orientation.y,request->target_pose.orientation.z);
         camera_frame_pose_.translation() = camera_pos;
         camera_frame_pose_.linear() = camera_ori.toRotationMatrix();
         add_workspace_collision(workspace_collision);
-        if(psi.applyCollisionObject(workspace_collision))
+        if(psi_->applyCollisionObject(workspace_collision))
             response->set__result(true);
         else
             response->set__result(false);
-
+        rclcpp::sleep_for(std::chrono::milliseconds(20));
     };
 
     void TaskConstructorPlanner::VisualEndEff(
@@ -334,7 +340,7 @@ namespace the_task_generator
             // set goal pose
             RCLCPP_INFO(this->get_logger(),"Set Goal Pose");
             move_to_stage->setGoal(group_state_name);
-            move_to_stage->setTimeout(planning_timeout_);
+            move_to_stage->setTimeout(this->get_parameter("planning_timeout").as_double());
 
             task_->add(std::move(move_to_stage));
 
@@ -439,11 +445,16 @@ namespace the_task_generator
                 solution_set_ = res;
                 response->set__result(res);
                 response->set__error("Moveit Response: " + moveit::core::error_code_to_string(err));
+                if(!res)
+                {
+                    task_.reset();
+                }
             }
             else
             {
                 response->set__result(false);
                 response->set__error("Moveit Task Constructor initialization Error");
+                task_.reset();
             }
         }
         else
@@ -468,7 +479,7 @@ namespace the_task_generator
         // create planner, chose pipeline planner
         RCLCPP_INFO(this->get_logger(),"create planner pipeline");
         auto sampling_planner = std::make_shared<mtc::solvers::PipelinePlanner>(this->shared_from_this());
-        
+        sampling_planner->setPlannerId(this->get_parameter("planner_id").as_string());
         task_->addTaskCallback([this](const mtc::Task& t) { this->ShowErrors(t); });
           
         // set goal pose tollerance TODO set as parameter
@@ -493,7 +504,7 @@ namespace the_task_generator
             // set goal pose
             RCLCPP_INFO(this->get_logger(),"Set Goal Pose");
             move_to_stage->setGoal(target_pose);
-            move_to_stage->setTimeout(planning_timeout_);
+            move_to_stage->setTimeout(this->get_parameter("planning_timeout").as_double());
 
             task_->add(std::move(move_to_stage));
 

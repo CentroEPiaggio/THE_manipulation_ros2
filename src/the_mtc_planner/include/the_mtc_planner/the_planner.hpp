@@ -127,6 +127,7 @@ namespace the_task_generator
             std::string group_name_, default_eef_ik_;
             int max_plan_solution_;
             double planning_timeout_;
+            std::unique_ptr<moveit::planning_interface::PlanningSceneInterface> psi_;
 
     };
 

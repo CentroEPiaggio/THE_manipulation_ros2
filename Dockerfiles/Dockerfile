@@ -8,6 +8,7 @@ RUN apt upgrade -y
 RUN apt install -y \
     ros-humble-ros2-control \
     ros-humble-ros2-controllers \
+    ros-humble-controller-manager \
     ros-humble-ur 
 RUN apt install -y ros-humble-moveit \
     ros-humble-graph-msgs \

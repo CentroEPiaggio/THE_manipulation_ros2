@@ -40,6 +40,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   
 )
 add_library(${PROJECT_NAME}_extr_calibration SHARED src/calib_task_planner.cpp)
+add_library(${PROJECT_NAME} SHARED src/the_planner.cpp)
 
 target_include_directories(${PROJECT_NAME}_extr_calibration PUBLIC
 
@@ -47,13 +48,19 @@ $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 
 $<INSTALL_INTERFACE:include>)
 
-ament_target_dependencies(${PROJECT_NAME}_extr_calibration ${THIS_PACKAGE_INCLUDE_DEPENDS})
+target_include_directories(${PROJECT_NAME} PUBLIC
 
+$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+
+$<INSTALL_INTERFACE:include>)
+
+ament_target_dependencies(${PROJECT_NAME}_extr_calibration ${THIS_PACKAGE_INCLUDE_DEPENDS})
+ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
 add_executable(extr_calibration_node src/calib_task_planner_node.cpp)
 ament_target_dependencies(extr_calibration_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
 #ament_target_dependencies(extr_calib_mgi_node ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
-target_link_libraries(extr_calibration_node ${PROJECT_NAME}_extr_calibration)
+target_link_libraries(extr_calibration_node ${PROJECT_NAME})
 #target_link_libraries(extr_calib_mgi_node ${PROJECT_NAME}_extr_calibration)
 
 if(BUILD_TESTING)
@@ -81,11 +88,22 @@ install(
   LIBRARY DESTINATION lib
 )
 
+install(
+  TARGETS ${PROJECT_NAME}
+  EXPORT export_${PROJECT_NAME}
+  RUNTIME DESTINATION bin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+)
+
 ament_export_include_directories(
   include
 )
 ament_export_libraries(
   ${PROJECT_NAME}_extr_calibration
+)
+ament_export_libraries(
+  ${PROJECT_NAME}
 )
 
 ament_export_dependencies(

@@ -38,6 +38,10 @@ namespace the_task_generator{
             declare_parameter<bool>("visualize_cartesian_path",true);
         if(!this->has_parameter("table_dimensions"))
             declare_parameter<std::vector<double>>("table_dimensions",std::vector<double>());
+        if(!this->has_parameter("camera_frame_position"))
+            declare_parameter<std::vector<double>>("camera_frame_position",std::vector<double>({0.0,0.0,0.0}));
+        if(!this->has_parameter("camera_frame_orientation"))
+            declare_parameter<std::vector<double>>("camera_frame_orientation",std::vector<double>({1.0,0.0,0.0,0.0}));
         
         this->get_parameters();
 

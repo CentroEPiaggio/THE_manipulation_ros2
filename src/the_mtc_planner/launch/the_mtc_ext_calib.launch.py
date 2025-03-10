@@ -191,7 +191,7 @@ def generate_launch_description():
                 "camera_frame_position": [1.0, 0.0, 1.0],
                 "camera_frame_orientation": [0.0, 0.7071068, 0, -0.7071068],
                 "workspace_dimensions_camera_frame": [0.5, 0.5, 0.5],
-                "table_dimensions": [4.0, 2.0, 0.1],
+                "table_dimensions": [4.0, 1.5, 0.1],
                 "default_eef_ik": "aruco_frame"
             },
         ],

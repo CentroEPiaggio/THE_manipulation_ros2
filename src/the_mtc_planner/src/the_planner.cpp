@@ -74,6 +74,8 @@ namespace the_task_generator
             declare_parameter<bool>("visualize_cartesian_path",true);
         if(!this->has_parameter("table_dimensions"))
             declare_parameter<std::vector<double>>("table_dimensions",std::vector<double>());
+        if(!this->has_parameter("table_protective_wall"))
+            declare_parameter<bool>("table_protective_wall",true);
         if(!this->has_parameter("camera_frame_position"))
             declare_parameter<std::vector<double>>("camera_frame_position",std::vector<double>({0.0,0.0,0.0}));
         if(!this->has_parameter("camera_frame_orientation"))
@@ -160,9 +162,42 @@ namespace the_task_generator
         table_collision.primitives.push_back(prim);
         table_collision.primitive_poses.push_back(table_pose);
         table_collision.operation = table_collision.ADD;
+        if(this->get_parameter("table_protective_wall").as_bool())
+        {
+            // back wall
+            prim.type = prim.BOX;
+            prim.dimensions[prim.BOX_X] =  OBSTACLE_THICKNESS;
+            prim.dimensions[prim.BOX_Y] = table_dimensions[1];
+            prim.dimensions[prim.BOX_Z] = 1.5;
+            table_pose.position.x = -table_dimensions[0]/2 - OBSTACLE_THICKNESS/2;
+            table_pose.position.y = 0.0;
+            table_pose.position.z = 0.75;
+            table_collision.primitives.push_back(prim);
+            table_collision.primitive_poses.push_back(table_pose);
+            //front wall
+            table_pose.position.x = table_dimensions[0]/2 + OBSTACLE_THICKNESS/2;
+            table_collision.primitives.push_back(prim);
+            table_collision.primitive_poses.push_back(table_pose);
+            //left wall
+            prim.dimensions[prim.BOX_X] = table_dimensions[0];
+            prim.dimensions[prim.BOX_Y] = OBSTACLE_THICKNESS;
+            prim.dimensions[prim.BOX_Z] = 1.5;
+            table_pose.position.x = 0.0;
+            table_pose.position.y = -table_dimensions[1]/2 - OBSTACLE_THICKNESS/2;
+            table_pose.position.z = 0.75;
+            table_collision.primitives.push_back(prim);
+            table_collision.primitive_poses.push_back(table_pose);
+            //right wall
+            table_pose.position.y = table_dimensions[1]/2 + OBSTACLE_THICKNESS/2;
+            table_collision.primitives.push_back(prim);
+            table_collision.primitive_poses.push_back(table_pose);  
+        }
+
         psi_->applyCollisionObject(table_collision);
+        rclcpp::sleep_for(std::chrono::milliseconds(20));
         add_workspace_collision(workspace_collision);
         psi_->applyCollisionObject(workspace_collision);
+        rclcpp::sleep_for(std::chrono::milliseconds(20));
         
 
 

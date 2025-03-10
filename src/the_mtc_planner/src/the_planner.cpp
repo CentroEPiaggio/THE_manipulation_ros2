@@ -67,9 +67,9 @@ namespace the_task_generator
         if(!this->has_parameter("default_eef_ik"))
             declare_parameter<std::string>("default_eef_ik","fixed_fingertip");
         if(!this->has_parameter("max_plan_solution"))
-            declare_parameter<int>("max_plan_solution",2);
+            declare_parameter<int>("max_plan_solution",10);
         if(!this->has_parameter("planning_timeout"))
-            declare_parameter<double>("planning_timeout",30.0);
+            declare_parameter<double>("planning_timeout",15.0);
         if(!this->has_parameter("visualize_cartesian_path"))
             declare_parameter<bool>("visualize_cartesian_path",true);
         if(!this->has_parameter("table_dimensions"))
@@ -488,6 +488,7 @@ namespace the_task_generator
         RCLCPP_INFO(this->get_logger(),"position tollerance created");
         sampling_planner->setProperty("goal_orientation_tolerance",1e-2);
         RCLCPP_INFO(this->get_logger(),"Planner Created");
+        
         // create a current state stage to generate the inital joint position
         {
             auto current_state = std::make_unique<mtc::stages::CurrentState>("current state");

@@ -96,7 +96,7 @@ def generate_launch_description():
             "input_recipe_filename": "rtde_input_recipe.txt",
             "output_recipe_filename": "rtde_output_recipe.txt",
             "prefix": "",
-            "sim_ignition": "true"
+            "sim_ignition": "false"
         }
     )
     #set robot description semantic
@@ -114,7 +114,7 @@ def generate_launch_description():
     moveit_config_builder.joint_limits()
 
     moveit_config_builder.trajectory_execution(
-        file_path="config/ur_softclaw_controllers_sim.yaml",
+        file_path="config/ur_softclaw_controllers.yaml",
         moveit_manage_controllers=False
     )
 
@@ -184,16 +184,17 @@ def generate_launch_description():
             moveit_config.robot_description_kinematics,
             moveit_config.planning_pipelines,
             moveit_config.joint_limits,
+            moveit_config.trajectory_execution,
             {
                 "use_sim_time": True,
                 "visualize_trajectory": visualize_trajectory,
                 "gui_debug": gui_debug,
-                "camera_frame_position": [1.0, 0.0, 1.0],
-                "camera_frame_orientation": [0.0, 0.7071068, 0, -0.7071068],
+                "camera_frame_position": [0.0, 0.85, 0.71],
+                "camera_frame_orientation": [0.5, 0.5, 0.5, -0.5],
                 "workspace_dimensions_camera_frame": [0.5, 0.5, 0.5],
-                "table_dimensions": [4.0, 1.5, 0.1],
+                "table_dimensions": [1.2, 4.0, 0.1],
                 "default_eef_ik": "aruco_frame",
-                "manipulator_controller": "joint_trajectory_controller"
+                "manipulator_controller": "scaled_joint_trajectory_controller"
             },
         ],
     )
@@ -211,11 +212,12 @@ def generate_launch_description():
     #simulation launch
     sim_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            [FindPackageShare("ur5_softclaw_gz"), "/launch", "/ur_softclaw_gz.launch.py"]  
+            [FindPackageShare("ur_softclaw_bringup"), "/launch", "/ur_softclaw_bringup.launch.py"]  
         ),
         launch_arguments={
             "ur_type": ur_type,
             "launch_rviz": "false",
+            "robot_ip": "192.168.15.10"
         }.items(),
     )    
 

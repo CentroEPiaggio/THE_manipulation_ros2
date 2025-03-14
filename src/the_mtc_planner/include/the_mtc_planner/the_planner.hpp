@@ -124,7 +124,7 @@ namespace the_task_generator
                 // respect camera frame is define the distnce on the right (-y), on the left (+y), on the front (-x), on the back (-x)
             std::vector<double> workspace_dimensions_camera_frame_ = {0.4,0.4,0.6},table_dimensions_;
             bool gui_debug_, visualize_cartesian_path_;
-            std::string group_name_, default_eef_ik_;
+            std::string manip_group_name_, default_eef_ik_;
             int max_plan_solution_;
             double planning_timeout_;
             std::unique_ptr<moveit::planning_interface::PlanningSceneInterface> psi_;

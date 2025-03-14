@@ -1,10 +1,11 @@
 #include "the_mtc_planner/the_planner.hpp"
 #include <moveit/task_constructor/solvers/pipeline_planner.h>
+#include <moveit/task_constructor/solvers/cartesian_path.h>
 #include <moveit/utils/moveit_error_code.h>
 #include <string>
 #include <memory>
 #include <moveit_task_constructor_msgs/srv/get_solution.hpp>
-
+#include <moveit_task_constructor_msgs/msg/trajectory_execution_info.hpp>
 
 namespace the_task_generator
 {
@@ -60,8 +61,8 @@ namespace the_task_generator
 
     void TaskConstructorPlanner::declare_parameters()
     {
-        if(!this->has_parameter("group_name"))
-            declare_parameter<std::string>("group_name","ur_manipulator");
+        if(!this->has_parameter("manipulator_group_name"))
+            declare_parameter<std::string>("manipulator_group_name","ur_manipulator");
         if(!this->has_parameter("planner_id"))
             declare_parameter<std::string>("planner_id","RRTConnectkConfigDefault");
         if(!this->has_parameter("default_eef_ik"))
@@ -82,6 +83,8 @@ namespace the_task_generator
             declare_parameter<std::vector<double>>("camera_frame_orientation",std::vector<double>({1.0,0.0,0.0,0.0}));
         if(!this->has_parameter("workspace_dimensions_camera_frame"))
             declare_parameter<std::vector<double>>("workspace_dimensions_camera_frame",std::vector<double>({0.5,0.5,0.5}));
+        if(!this->has_parameter("manipulator_controller"))
+            declare_parameter<std::string>("manipulator_controller","scaled_joint_trajectory_controller");
 
     };
 
@@ -89,7 +92,7 @@ namespace the_task_generator
     {
         double quaternion_norm;
         std::vector<double> table_dimensions, camera_frame_position, camera_frame_orientation, workspace_dimensions_camera_frame;
-        this->get_parameter("group_name",group_name_);
+        this->get_parameter("manipulator_group_name",manip_group_name_);
         this->get_parameter("default_eef_ik",default_eef_ik_);
         this->get_parameter("max_plan_solution",max_plan_solution_);
         
@@ -352,7 +355,7 @@ namespace the_task_generator
         task_.reset(new mtc::Task());
         task_->loadRobotModel(this->shared_from_this());
         // set task properties, moveit group used to plan and ik frame used to plan
-        task_->setProperty("group",group_name_);
+        task_->setProperty("group",manip_group_name_);
         RCLCPP_INFO(this->get_logger(),"Task Properties Set");
         // create planner, chose pipeline planner
         RCLCPP_INFO(this->get_logger(),"create planner pipeline");
@@ -367,11 +370,15 @@ namespace the_task_generator
         }
         // create the move to stage setup with target pose and motion duration 
         {
+            moveit_task_constructor_msgs::msg::TrajectoryExecutionInfo traj_info;
+            traj_info.controller_names.push_back(
+                this->get_parameter("manipulator_controller").as_string()
+            );
             auto move_to_stage = std::make_unique<mtc::stages::MoveTo>("move_to_pose",sampling_planner);
             // set stage properties from task properties
             RCLCPP_INFO(this->get_logger(),"Set Stage Properties");
-            move_to_stage->setGroup(group_name_);
-            
+            move_to_stage->setGroup(manip_group_name_);
+            move_to_stage->setTrajectoryExecutionInfo(traj_info);
             // set goal pose
             RCLCPP_INFO(this->get_logger(),"Set Goal Pose");
             move_to_stage->setGoal(group_state_name);
@@ -401,7 +408,7 @@ namespace the_task_generator
         MoveitError err;
         if(!task_)
         {
-            std::vector<std::string> group_state_names = visual_tools_->getRobotModel()->getJointModelGroup(group_name_)->getDefaultStateNames();
+            std::vector<std::string> group_state_names = visual_tools_->getRobotModel()->getJointModelGroup(manip_group_name_)->getDefaultStateNames();
             // RCLCPP_INFO(this->get_logger(),"The default state name are:");
             // for(auto name : group_state_names)
             //     RCLCPP_INFO(this->get_logger(),"-> %s",name.c_str());
@@ -413,13 +420,21 @@ namespace the_task_generator
                     RCLCPP_INFO(this->get_logger(),"Task Built, Try to Plan");
                      res = this->PlanTask(err);
                     solution_set_ = res;
+                    
                     response->set__result(res);
+                
                     response->set__error("Moveit Response: " + moveit::core::error_code_to_string(err));
+                    if(!res)
+                    {
+                        task_.reset();
+                    }
                 }
+                
                 else
                 {
                     response->set__result(false);
                     response->set__error("Moveit Task Constructor initialization Error");
+                    task_.reset();
                 }
             }
             else
@@ -444,7 +459,7 @@ namespace the_task_generator
             response->set__message("The Solution Trajectory has not been set");
         }
         else
-        {
+        {   
             //execute the planned solution 
             error = task_->execute(*task_->solutions().front());
             if(error == moveit::core::MoveItErrorCode::SUCCESS)
@@ -508,7 +523,7 @@ namespace the_task_generator
         task_.reset(new mtc::Task());
         task_->loadRobotModel(this->shared_from_this());
         // set task properties, moveit group used to plan and ik frame used to plan
-        task_->setProperty("group",group_name_);
+        task_->setProperty("group",manip_group_name_);
         task_->setProperty("ik_frame",default_eef_ik_);
         RCLCPP_INFO(this->get_logger(),"Task Properties Set");
         // create planner, chose pipeline planner
@@ -524,6 +539,7 @@ namespace the_task_generator
         sampling_planner->setProperty("goal_orientation_tolerance",1e-2);
         RCLCPP_INFO(this->get_logger(),"Planner Created");
         
+        
         // create a current state stage to generate the inital joint position
         {
             auto current_state = std::make_unique<mtc::stages::CurrentState>("current state");
@@ -531,12 +547,17 @@ namespace the_task_generator
         }
         // create the move to stage setup with target pose and motion duration 
         {
+            moveit_task_constructor_msgs::msg::TrajectoryExecutionInfo traj_info;
+            traj_info.controller_names.push_back(
+                this->get_parameter("manipulator_controller").as_string()
+            );
             auto move_to_stage = std::make_unique<mtc::stages::MoveTo>("move_to_pose",sampling_planner);
             // set stage properties from task properties
             RCLCPP_INFO(this->get_logger(),"Set Stage Properties");
-            move_to_stage->setGroup(group_name_);
+            move_to_stage->setGroup(manip_group_name_);
             RCLCPP_INFO(this->get_logger(),"Set Stage Properties");
             move_to_stage->setIKFrame(default_eef_ik_);
+            move_to_stage->setTrajectoryExecutionInfo(traj_info);
             // set goal pose
             RCLCPP_INFO(this->get_logger(),"Set Goal Pose");
             move_to_stage->setGoal(target_pose);
@@ -578,7 +599,11 @@ namespace the_task_generator
                 sol_req->set__solution_id(task_->introspection().solutionId(*task_->solutions().front()));
                 task_->introspection().getSolution(sol_req,sol_res);
                 for(auto & traj : sol_res->solution.sub_trajectory)
-                {
+                {   
+                    RCLCPP_INFO(this->get_logger(),"Trajectory Info");
+                    for(auto & name : traj.execution_info.controller_names)
+                        RCLCPP_INFO(this->get_logger(),"Controller Name: %s",name.c_str());
+                    RCLCPP_INFO(this->get_logger(),"Trajectory end");
                     visual_tools_->publishTrajectoryLine(traj.trajectory,
                     visual_tools_->getRobotModel()->getJointModelGroup("ur_softclaw_manipulator"));
                 }

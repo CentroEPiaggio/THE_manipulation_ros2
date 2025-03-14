@@ -245,7 +245,9 @@ namespace the_task_generator{
         else
         {
             //execute the planned solution 
+            
             error = task_->execute(*task_->solutions().front());
+
             if(error == moveit::core::MoveItErrorCode::SUCCESS)
                 response->set__success(true);
             else
@@ -317,6 +319,8 @@ namespace the_task_generator{
         RCLCPP_INFO(this->get_logger(),"position tollerance created");
         sampling_planner->setProperty("goal_orientation_tolerance",1e-2);
         RCLCPP_INFO(this->get_logger(),"Planner Created");
+        // trajectory_processing::TimeParameterizationPtr tp() = std::make_shared<trajectory_processing::TimeParameterization>();
+        // sampling_planner->setTimeParameterization()
         // create a current state stage to generate the inital joint position
         {
             auto current_state = std::make_unique<mtc::stages::CurrentState>("current state");

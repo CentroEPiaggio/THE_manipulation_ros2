@@ -19,3 +19,6 @@
 [submodule "src/qbmove-ros"]
 	path = src/qbmove-ros
 	url = https://bitbucket.org/qbrobotics/qbmove-ros.git
+[submodule "src/THE_ROS2_interfaces"]
+	path = src/THE_ROS2_interfaces
+	url = https://github.com/CentroEPiaggio/THE_ROS2_interfaces.git

@@ -13,9 +13,6 @@
 [submodule "src/moveit_task_constructor"]
 	path = src/moveit_task_constructor
 	url = https://github.com/ros-planning/moveit_task_constructor.git
-[submodule "src/THE_ROS2_interfaces"]
-	path = src/THE_ROS2_interfaces
-	url = https://github.com/CentroEPiaggio/THE_ROS2_interfaces.git
 [submodule "src/qbdevice-ros"]
 	path = src/qbdevice-ros
 	url = https://bitbucket.org/qbrobotics/qbdevice-ros.git

@@ -6,6 +6,7 @@
 #include <memory>
 #include <moveit_task_constructor_msgs/srv/get_solution.hpp>
 #include <moveit_task_constructor_msgs/msg/trajectory_execution_info.hpp>
+#include <stdexcept>
 
 namespace the_task_generator
 {
@@ -142,6 +143,16 @@ namespace the_task_generator
                 table_dimensions = default_table_dimensions;
             }
         }
+        if(
+            camera_frame_pose_.translation()(0) > table_dimensions[0]/2 ||
+            camera_frame_pose_.translation()(0) < -table_dimensions[0]/2 ||
+            camera_frame_pose_.translation()(1) > table_dimensions[1]/2 ||
+            camera_frame_pose_.translation()(1) < -table_dimensions[1]/2 
+            )
+        {
+            RCLCPP_ERROR(this->get_logger(), "picking workspace is not on the table");
+            throw std::runtime_error("Incorrect Parameter Settings");
+        }
         set_up_planning_scene(table_dimensions);
     }
 
@@ -172,13 +183,32 @@ namespace the_task_generator
             prim.dimensions[prim.BOX_X] =  OBSTACLE_THICKNESS;
             prim.dimensions[prim.BOX_Y] = table_dimensions[1];
             prim.dimensions[prim.BOX_Z] = 1.5;
-            table_pose.position.x = -table_dimensions[0]/2 - OBSTACLE_THICKNESS/2;
+            if(table_dimensions[1] < table_dimensions[0])
+            {
+                if(camera_frame_pose_.translation()(0)<= 0 )
+                    table_pose.position.x = -table_dimensions[0]/2 - OBSTACLE_THICKNESS/2;
+                else 
+                    table_pose.position.x = -0.5;
+            }
+            else
+                table_pose.position.x = -table_dimensions[0]/2 - OBSTACLE_THICKNESS/2; 
             table_pose.position.y = 0.0;
             table_pose.position.z = 0.75;
             table_collision.primitives.push_back(prim);
             table_collision.primitive_poses.push_back(table_pose);
             //front wall
-            table_pose.position.x = table_dimensions[0]/2 + OBSTACLE_THICKNESS/2;
+            if(table_dimensions[1] < table_dimensions[0])
+            {
+                if(camera_frame_pose_.translation()(0) >= 0 )
+                    table_pose.position.x = table_dimensions[0]/2 + OBSTACLE_THICKNESS/2;
+                else 
+                    table_pose.position.x = 0.5;
+            }
+            else
+                table_pose.position.x = table_dimensions[0]/2 + OBSTACLE_THICKNESS/2;
+
+                
+            
             table_collision.primitives.push_back(prim);
             table_collision.primitive_poses.push_back(table_pose);
             //left wall
@@ -186,12 +216,28 @@ namespace the_task_generator
             prim.dimensions[prim.BOX_Y] = OBSTACLE_THICKNESS;
             prim.dimensions[prim.BOX_Z] = 1.5;
             table_pose.position.x = 0.0;
-            table_pose.position.y = -table_dimensions[1]/2 - OBSTACLE_THICKNESS/2;
+            if(table_dimensions[1] > table_dimensions[0])
+            {
+                if(camera_frame_pose_.translation()(1)<= 0)
+                    table_pose.position.y = -table_dimensions[1]/2 - OBSTACLE_THICKNESS/2;
+                else 
+                    table_pose.position.y = -0.5;
+            }
+            else
+                table_pose.position.y = -table_dimensions[1]/2 - OBSTACLE_THICKNESS/2;
             table_pose.position.z = 0.75;
             table_collision.primitives.push_back(prim);
             table_collision.primitive_poses.push_back(table_pose);
             //right wall
-            table_pose.position.y = table_dimensions[1]/2 + OBSTACLE_THICKNESS/2;
+            if(table_dimensions[1] > table_dimensions[0])
+            {
+                if(camera_frame_pose_.translation()(1)>=0)
+                    table_pose.position.y = table_dimensions[1]/2 + OBSTACLE_THICKNESS/2;
+                else
+                    table_pose.position.y = 0.5;
+            }
+            else
+                table_pose.position.y = table_dimensions[1]/2 + OBSTACLE_THICKNESS/2;   
             table_collision.primitives.push_back(prim);
             table_collision.primitive_poses.push_back(table_pose);  
         }
